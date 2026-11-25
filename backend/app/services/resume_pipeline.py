@@ -19,6 +19,7 @@ def save_upload(filename: str, file_bytes: bytes) -> str:
     """Store the file under a random name so user-supplied names can never overwrite or traverse paths."""
     extension = Path(filename).suffix.lower()
     stored_path = Path(settings.upload_dir) / f"{uuid.uuid4().hex}{extension}"
+    stored_path.parent.mkdir(parents=True, exist_ok=True)
     stored_path.write_bytes(file_bytes)
     return str(stored_path)
 

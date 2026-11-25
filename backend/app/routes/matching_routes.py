@@ -1,5 +1,6 @@
 """AI matching, human override, and semantic search (admin only)."""
 from datetime import datetime
+from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -7,9 +8,10 @@ from app.auth import require_roles
 from app.database import get_db
 from app.models.tables import Job, Candidate, MatchResult, ROLE_ADMIN
 from app.routes.candidate_routes import candidate_to_dict
-from app.schemas.schemas import OverrideRequest, SearchRequest
+from app.schemas.schemas import OverrideRequest, RagRequest, SearchRequest
 from app.services import embedding_service
 from app.services.matching_service import match_candidate_to_job
+from app.services.rag_service import RagGenerationError, generate_grounded_answer
 from app.services.semantic_search import semantic_search
 
 router = APIRouter(prefix="/api", tags=["AI Matching & Search"], dependencies=[Depends(require_roles(ROLE_ADMIN))])
@@ -97,3 +99,53 @@ def search_candidates(data: SearchRequest, db: Session = Depends(get_db)):
             continue
         results.append({**candidate_to_dict(candidate), "similarity": similarity})
     return results
+
+
+def _candidate_evidence(candidate: Candidate, similarity: float) -> dict[str, Any]:
+    return {
+        "candidate_id": candidate.id,
+        "similarity": similarity,
+        "summary": (candidate.summary or "")[:1200],
+        "skills": (candidate.technical_skills or [])[:30],
+        "experience_years": candidate.total_experience_years,
+        "education": (candidate.education or [])[:5],
+        "employment_history": [
+            {
+                "title": item.get("title"),
+                "description": (item.get("description") or "")[:500],
+            }
+            for item in (candidate.employment_history or [])[:5]
+            if isinstance(item, dict)
+        ],
+        "projects": [
+            {
+                "name": item.get("name"),
+                "description": (item.get("description") or "")[:500],
+            }
+            for item in (candidate.projects or [])[:5]
+            if isinstance(item, dict)
+        ],
+    }
+
+
+@router.post("/search/answer")
+def answer_candidate_question(data: RagRequest, db: Session = Depends(get_db)):
+    """Retrieve candidate evidence, then generate an answer grounded in those profiles."""
+    hits = semantic_search(data.question, data.top_k)
+    evidence = []
+    sources = []
+    for candidate_id, similarity in hits:
+        candidate = db.get(Candidate, candidate_id)
+        if candidate is None:
+            continue
+        evidence.append(_candidate_evidence(candidate, similarity))
+        sources.append(
+            {"candidate_id": candidate.id, "name": candidate.name, "similarity": similarity}
+        )
+    if not evidence:
+        return {"answer": "No matching candidate profiles were found.", "sources": []}
+    try:
+        answer = generate_grounded_answer(data.question, evidence)
+    except RagGenerationError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+    return {"answer": answer, "sources": sources}

@@ -14,7 +14,7 @@ if (-not (Test-Path "venv")) {
 }
 & ".\venv\Scripts\python.exe" -m pip install --upgrade pip
 & ".\venv\Scripts\python.exe" -m pip install -r requirements.txt
-& ".\venv\Scripts\python.exe" seed_demo_users.py
+& ".\venv\Scripts\python.exe" seed_demo_data.py
 
 Set-Location "..\frontend"
 npm install

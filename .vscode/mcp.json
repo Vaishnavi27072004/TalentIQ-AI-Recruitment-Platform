@@ -1,0 +1,30 @@
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "talentflowEmail",
+      "description": "TalentFlow admin email",
+      "default": "admin@demo.com"
+    },
+    {
+      "type": "promptString",
+      "id": "talentflowPassword",
+      "description": "TalentFlow admin password",
+      "password": true
+    }
+  ],
+  "servers": {
+    "talentflow": {
+      "type": "stdio",
+      "command": "${workspaceFolder}\\backend\\venv\\Scripts\\python.exe",
+      "args": [
+        "${workspaceFolder}\\backend\\mcp_server.py"
+      ],
+      "env": {
+        "TALENTFLOW_API_URL": "http://127.0.0.1:8000",
+        "TALENTFLOW_EMAIL": "${input:talentflowEmail}",
+        "TALENTFLOW_PASSWORD": "${input:talentflowPassword}"
+      }
+    }
+  }
+}

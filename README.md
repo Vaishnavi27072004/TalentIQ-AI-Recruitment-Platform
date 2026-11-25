@@ -24,7 +24,10 @@ Then open:
 - Frontend: http://localhost:5173
 - Backend Swagger: http://localhost:8000/docs
 
-`setup.ps1` creates the virtual environment, installs dependencies, copies `.env.example` to `.env`, and creates demo accounts. `start.ps1` opens the backend and frontend in separate terminals.
+`setup.ps1` creates the virtual environment, installs dependencies, copies `.env.example` to `.env`, and seeds demo accounts, jobs, and resumes. `start.ps1` opens the backend and frontend in separate terminals.
+The setup step seeds the fictional sample jobs and valid DOCX resumes from `sample_data/` into the database and upload store. It is safe to rerun; invalid test files are intentionally excluded.
+
+To use the MCP server in VS Code, open this repository folder as the workspace after setup. Approve or start the `talentflow` server from `.vscode/mcp.json` and enter an admin email/password when prompted. If the backend is on a different port, update `TALENTFLOW_API_URL` in that config; the default is `http://127.0.0.1:8000`.
 
 ### Manual setup
 
@@ -35,7 +38,7 @@ python -m venv venv
 source venv/bin/activate            # Windows: venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 copy ..\.env.example .env           # then edit .env; a Groq/Gemini key is optional
-python seed_demo_users.py           # creates demo admin, candidate and interviewer accounts
+python seed_demo_data.py            # creates demo accounts, sample jobs and sample candidates/resumes
 uvicorn app.main:app --reload       # API on http://localhost:8000  (Swagger docs: /docs)
 
 # 2) Frontend (new terminal)
@@ -50,7 +53,7 @@ The default database is SQLite at `backend/recruitment.db`. The Analytics page f
 
 To use MySQL instead, create the database first, install the PyMySQL driver with `pip install pymysql`, and set `DATABASE_URL=mysql+pymysql://USER:PASSWORD@localhost:3306/recruitment?charset=utf8mb4` in `backend/.env`. `create_all()` creates missing tables but does not copy or migrate existing SQLite records.
 
-**Demo credentials** (fictional, created by `seed_demo_users.py`)
+**Demo credentials** (fictional, created by `seed_demo_data.py`)
 
 | Role | Email | Password |
 |---|---|---|
@@ -61,9 +64,9 @@ To use MySQL instead, create the database first, install the PyMySQL driver with
 
 Candidates can also register with their own email. All three roles use the same sign-in page; the account role determines the portal.
 
-**Run the tests:** `cd backend && python -m pytest -q` (35 tests, work offline, see section 7).
+**Run the tests:** `cd backend && python -m pytest -q` (47 tests, work offline, see section 7).
 
-**Sample data:** `python sample_data/generate_sample_resumes.py` writes 5 fictional DOCX resumes plus 2 invalid files into `sample_data/resumes/`. Job descriptions to copy are in `sample_data/sample_jobs.md`.
+**Sample data:** from `backend/`, run `python seed_demo_data.py` to load the included fictional job descriptions and valid DOCX resumes into the database. To regenerate the files, run `python sample_data/generate_sample_resumes.py` from the project root; it also writes invalid files used by the error-handling scenario. Job descriptions are in `sample_data/sample_jobs.md`.
 
 ---
 
@@ -131,6 +134,14 @@ Key rules: `candidates.email` is unique and normalised (lowercase) so duplicates
 
 **Human-in-the-loop:** AI recommends, the admin can override per candidate (reason stored), shortlisting and approval are manual, candidates can correct anything the AI extracted.
 
+### Tool calling and retrieval
+
+The stdio MCP server (`backend/mcp_server.py`) registers four read-only tools: `list_jobs`, `search_candidates`, `answer_candidate_question`, and `get_job_matches`. It calls the existing FastAPI endpoints using an admin login, so API role checks remain in force; it accepts connections only to a loopback API address and does not expose a network listener. VS Code prompts for the admin credentials rather than storing them in the committed MCP config.
+
+**RAG flow:** `answer_candidate_question` embeds the admin's question with `all-MiniLM-L6-v2`, retrieves the nearest candidate IDs from ChromaDB, and hydrates their current profiles from SQLite. The API limits the context to the top 10 results and omits email and phone fields; the configured Groq/Gemini model then generates a concise answer using only that context and must cite candidate IDs. The response includes the answer and matching source IDs/names. If no candidates are retrieved, no LLM call is made. Retrieved profile excerpts are sent to the configured LLM provider for generation, so use fictional demo profiles for the recording.
+
+**Chunking:** this project does not split profiles into fixed-size chunks. It assembles each candidate into one text document and stores one 384-dimensional vector per profile; job descriptions are stored similarly. This keeps retrieval simple and returns candidate-level sources, but long profiles are represented by a single embedding rather than independently retrievable passages.
+
 ## 5. Matching methodology
 
 `final = Σ weight × component`, each component 0–100, weights in `.env` (default below).
@@ -151,7 +162,7 @@ Swagger UI is generated automatically at **http://localhost:8000/docs** (use *Au
 
 ## 7. Mandatory test scenarios, results
 
-**Automated results** (`backend/tests`, 38 tests passing). These run the real API, database, auth, scoring and workflow code, but use a *stub* in place of the LLM and the embedding model so they work offline. They prove the logic, not the live AI quality.
+**Automated results** (`backend/tests`, 47 tests passing). These run the real API, database, auth, scoring and workflow code, but use a *stub* in place of the LLM and the embedding model so they work offline. They prove the logic, not the live AI quality.
 
 | # | Scenario | Automated test | Live verification |
 |---|---|---|---|
