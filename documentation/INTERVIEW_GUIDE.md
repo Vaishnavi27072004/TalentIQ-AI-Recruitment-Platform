@@ -31,6 +31,38 @@ Unavailable components are skipped and remaining weights are re-scaled. Matched 
 
 Candidate profiles and recruiter queries are represented with the same MiniLM embedding model. ChromaDB performs cosine-similarity search and returns candidate IDs. SQLite supplies the complete candidate records.
 
+## Explain RAG Answers
+
+The admin question is embedded and matched against candidate vectors in ChromaDB.
+TalentFlow uses the retrieved IDs to load current profile evidence from SQLite.
+It sends profile details to the configured Groq or Gemini model, but leaves out email and phone.
+The answer is grounded in that evidence and candidate-specific claims must cite candidate IDs.
+The API also returns the matching candidate IDs, names and similarity scores as sources.
+
+## Explain the MCP Server
+
+The stdio MCP server offers four read-only tools: list jobs, search candidates, answer a candidate question and get job matches.
+Each tool calls the existing TalentFlow API, so the API's admin role checks still apply.
+The server reads the admin login from `TALENTFLOW_EMAIL` and `TALENTFLOW_PASSWORD`.
+In VS Code, enter those values at the prompts; do not save credentials in the config.
+The configured API URL must be HTTP on localhost or a loopback IP; it does not open a network listener.
+
+## Explain the Offline Parser Fallback
+
+When the configured Groq or Gemini provider has no API key, parsing uses `parse_resume_locally`.
+This is a rule-based parser, not an LLM.
+It looks for common resume sections and extracts fields such as contact details, skills and experience.
+It can also estimate total experience from dates found in work history.
+It is a best-effort fallback, so the candidate should review and correct the editable profile.
+
+## Explain the Shortlist Share Link
+
+An admin can create a share link for one job's shortlist.
+The link contains a signed token and expires after 48 hours.
+Anyone with a valid link can view the shared shortlist without logging in.
+The response includes candidate name, experience, skills, match score and recommendation.
+It does not include email addresses or internal notes.
+
 ## Explain Security
 
 - Passwords use bcrypt.

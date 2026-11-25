@@ -3,8 +3,7 @@
     {
       "type": "promptString",
       "id": "talentflowEmail",
-      "description": "TalentFlow admin email",
-      "default": "admin@demo.com"
+      "description": "TalentFlow admin email"
     },
     {
       "type": "promptString",

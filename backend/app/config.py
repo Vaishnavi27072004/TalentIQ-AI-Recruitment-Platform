@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     # --- LLM (resume parsing). provider is "groq" or "gemini" ---
     llm_provider: str = "groq"
     groq_api_key: str = ""
-    groq_model: str = "llama-3.3-70b-versatile"
+    groq_model: str = "openai/gpt-oss-20b"
     gemini_api_key: str = ""
     gemini_model: str = "gemini-1.5-flash"
     llm_timeout_seconds: int = 60

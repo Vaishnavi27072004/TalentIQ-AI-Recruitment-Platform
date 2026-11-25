@@ -80,27 +80,35 @@ flowchart LR
     I[Interviewer portal]
   end
   C & A & I -->|Axios + JWT| API[FastAPI routes]
+  MCP[backend/mcp_server.py<br/>read-only stdio tools] -->|HTTP to loopback API + admin login| API
   API --> AUTH[auth.py: JWT, roles, ownership checks]
   API --> SVC[services]
-  SVC --> P[resume_parser: PyMuPDF/python-docx + Groq/Gemini + Pydantic]
+  SVC --> P[resume_parser: PyMuPDF/python-docx + Groq/Gemini or offline rule-based fallback + Pydantic]
   SVC --> E[embedding_service: MiniLM]
   SVC --> M[matching_service: pure Python maths]
   SVC --> S[semantic_search]
+  SVC --> R[rag_service: grounded answers with cited candidate IDs]
   SVC --> N[notification_service: SMTP or dev log]
   API --> DB[(SQLite via SQLAlchemy)]
   E --> V[(ChromaDB vectors)]
   S --> V
+  R --> V
+  R --> DB
 ```
 
-**Resume pipeline:** upload → validate type/size → extract text → clean → LLM returns JSON → Pydantic validates → save in SQLite → build candidate text → embed → upsert into ChromaDB (id = candidate id).
+**Resume pipeline:** upload → validate type/size → extract text → clean → parse with Groq/Gemini when a provider key is set, otherwise use `parse_resume_locally` (rule-based section extraction, not an LLM) → Pydantic validates → save in SQLite → build candidate text → embed → upsert into ChromaDB (id = candidate id).
 
 **Folder map**
 ```
 backend/app/
   routes/     one file per feature area (auth, candidates, jobs, matching, shortlist, interviews, analytics)
   models/     SQLAlchemy tables           schemas/   Pydantic request/response/LLM-output models
-  services/   resume_parser, embedding_service, matching_service, semantic_search, notification_service, resume_pipeline
+  services/   resume_parser.py (includes offline parse_resume_locally fallback)
+              rag_service.py (grounded answers with cited candidate IDs)
+              embedding_service.py, matching_service.py, semantic_search.py
+              notification_service.py, resume_pipeline.py
   auth.py  config.py  database.py  main.py
+backend/mcp_server.py  read-only MCP tools that call the loopback API
 frontend/src/ pages/{admin,candidate,interviewer}  components/  layouts/  context/  hooks/  services/
 ```
 
@@ -189,7 +197,7 @@ Extra tests cover duplicate detection, duplicate applications, override survival
 - **Interview questions:** admins can generate role- and skill-specific question suggestions from each job. They use transparent templates, not an LLM, and should be reviewed before use.
 - Scanned (image-only) PDFs are rejected; there is no OCR.
 - Skill matching uses an alias table + whole-word text search, not embeddings per skill.
-- Not built: live video interviews and the other stretch goals (multi-agent workflow, MCP, Docker).
+- Not built: live video interviews and the other stretch goals (multi-agent workflow, Docker). MCP tools and RAG answers are implemented.
 - Passwords are bcrypt-hashed. Login throttling and password-reset endpoints are implemented; the in-memory throttle is intended for a single local instance, not a multi-instance production deployment.
 
 See `documentation/INTERVIEW_GUIDE.md` for how to explain each part in the technical interview.
