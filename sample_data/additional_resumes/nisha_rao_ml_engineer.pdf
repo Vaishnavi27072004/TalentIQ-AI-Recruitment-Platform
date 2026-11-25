@@ -1,0 +1,140 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 1776 >>
+stream
+BT
+/F2 19 Tf
+1 0 0 1 54 752 Tm
+(Nisha Rao) Tj
+ET
+BT
+/F1 10 Tf
+1 0 0 1 54 730 Tm
+(Machine Learning Engineer | Bengaluru, India) Tj
+ET
+BT
+/F1 9 Tf
+1 0 0 1 54 717 Tm
+(nisha.rao@example.com | FICTIONAL DEMO RESUME) Tj
+ET
+q
+0.14 0.32 0.62 RG
+1 w
+54 709 m 558 709 l S
+Q
+BT
+/F2 10.5 Tf
+1 0 0 1 54 697 Tm
+(SUMMARY) Tj
+ET
+BT
+/F1 9 Tf
+1 0 0 1 54 675 Tm
+(Fictional machine learning engineer with 4 years of experience developing NLP models and) Tj
+ET
+BT
+/F1 9 Tf
+1 0 0 1 54 662 Tm
+(production inference services.) Tj
+ET
+BT
+/F2 10.5 Tf
+1 0 0 1 54 644 Tm
+(TECHNICAL SKILLS) Tj
+ET
+BT
+/F1 9 Tf
+1 0 0 1 54 622 Tm
+(Python, Machine Learning, Deep Learning, NLP, PyTorch, FastAPI, Docker, SQL, scikit-learn) Tj
+ET
+BT
+/F2 10.5 Tf
+1 0 0 1 54 604 Tm
+(EXPERIENCE) Tj
+ET
+BT
+/F2 9.5 Tf
+1 0 0 1 54 582 Tm
+(ML Engineer | Blue Orchard Labs | Jan 2022 - Present) Tj
+ET
+BT
+/F1 9 Tf
+1 0 0 1 54 569 Tm
+(- Developed NLP classifiers and evaluated model quality with reproducible test datasets.) Tj
+ET
+BT
+/F1 9 Tf
+1 0 0 1 54 556 Tm
+(- Packaged model inference as FastAPI services and containerized deployments with Docker.) Tj
+ET
+BT
+/F2 9.5 Tf
+1 0 0 1 54 543 Tm
+(Data Scientist | Meadowline Research | Jul 2021 - Dec 2021) Tj
+ET
+BT
+/F1 9 Tf
+1 0 0 1 54 530 Tm
+(- Built baseline text classification models and documented performance trade-offs.) Tj
+ET
+BT
+/F2 10.5 Tf
+1 0 0 1 54 512 Tm
+(PROJECTS) Tj
+ET
+BT
+/F1 9 Tf
+1 0 0 1 54 490 Tm
+(- Support Topic Classifier - Fine-tuned a text model to categorize support requests.) Tj
+ET
+BT
+/F2 10.5 Tf
+1 0 0 1 54 472 Tm
+(EDUCATION) Tj
+ET
+BT
+/F1 9 Tf
+1 0 0 1 54 450 Tm
+(M.Sc. Computer Science | Example Institute of Technology | 2021) Tj
+ET
+BT
+/F2 10.5 Tf
+1 0 0 1 54 432 Tm
+(CERTIFICATIONS) Tj
+ET
+BT
+/F1 9 Tf
+1 0 0 1 54 410 Tm
+(- Fictional sample: Applied Deep Learning) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000251 00000 n 
+0000002079 00000 n 
+0000002149 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R >>
+startxref
+2224
+%%EOF

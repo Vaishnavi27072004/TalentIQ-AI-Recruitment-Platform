@@ -78,7 +78,7 @@ export default function DashboardLayout() {
         <nav className="space-y-1">
           {MENUS[user.role].map(([to, label, Icon, end]) => (
             <NavLink key={to} to={to} end={end} onClick={() => setMenuOpen(false)}
-              className={({ isActive }) => `group flex items-center gap-3 rounded-xl border px-3 py-2.5 text-sm font-medium transition ${isActive ? 'border-brand-100 bg-brand-50 text-brand-700 shadow-sm' : 'border-transparent text-slate-600 hover:bg-slate-50 hover:text-navy-900'}`}>
+              className={({ isActive }) => `group flex items-center gap-3 rounded-xl border px-3 py-2.5 text-sm font-medium transition ${isActive ? 'border-slate-200 bg-slate-100 text-navy-900 shadow-sm' : 'border-transparent text-slate-600 hover:bg-slate-50 hover:text-navy-900'}`}>
               <Icon size={18} className="shrink-0 opacity-80 group-hover:opacity-100" />{label}
             </NavLink>
           ))}
