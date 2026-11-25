@@ -61,6 +61,28 @@ def test_s4_admin_creates_job(client, admin_headers):
     assert job["required_skills"] == ["Python", "SQL", "Power BI"] and job["min_experience"] == 2
 
 
+def test_admin_generates_job_specific_interview_questions(client, admin_headers):
+    job_id = client.post("/api/jobs", headers=admin_headers, json=JOB_PAYLOAD).json()["id"]
+
+    response = client.get(f"/api/jobs/{job_id}/interview-questions", headers=admin_headers)
+
+    assert response.status_code == 200
+    result = response.json()
+    assert result["job_title"] == "Data Analyst"
+    assert any("Python" in question["question"] for question in result["questions"])
+    assert any("Machine Learning" in question["question"] for question in result["questions"])
+    assert any(question["category"] == "Situational" for question in result["questions"])
+
+
+def test_candidates_cannot_generate_interview_questions(client, admin_headers):
+    job_id = client.post("/api/jobs", headers=admin_headers, json=JOB_PAYLOAD).json()["id"]
+    candidate_headers = register_candidate(client, "Asha Rao", "asha@example.com")
+
+    response = client.get(f"/api/jobs/{job_id}/interview-questions", headers=candidate_headers)
+
+    assert response.status_code == 403
+
+
 def test_job_rejects_maximum_experience_below_minimum(client, admin_headers):
     payload = {**JOB_PAYLOAD, "min_experience": 5, "max_experience": 2}
     assert client.post("/api/jobs", headers=admin_headers, json=payload).status_code == 422

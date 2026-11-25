@@ -151,7 +151,7 @@ Swagger UI is generated automatically at **http://localhost:8000/docs** (use *Au
 
 ## 7. Mandatory test scenarios, results
 
-**Automated results** (`backend/tests`, 36 tests passing). These run the real API, database, auth, scoring and workflow code, but use a *stub* in place of the LLM and the embedding model so they work offline. They prove the logic, not the live AI quality.
+**Automated results** (`backend/tests`, 38 tests passing). These run the real API, database, auth, scoring and workflow code, but use a *stub* in place of the LLM and the embedding model so they work offline. They prove the logic, not the live AI quality.
 
 | # | Scenario | Automated test | Live verification |
 |---|---|---|---|
@@ -168,16 +168,17 @@ Swagger UI is generated automatically at **http://localhost:8000/docs** (use *Au
 | 11 | Interviewer feedback → visible to admin | same test ✅ | ☐ Requires a live browser/API run |
 | 12 | Candidate opens another profile → denied (403) | `test_s12_candidate_cannot_view_another_candidate` ✅ | ☐ Requires a live browser/API run |
 
-Extra tests cover duplicate detection, duplicate applications, override survival, double-booking, shared-link expiry, and the scoring functions.
+Extra tests cover duplicate detection, duplicate applications, override survival, double-booking, shared-link expiry, interview-question generation and role access, and the scoring functions.
 
 ## 8. Honest limitations
 
 - **Groq resume parsing was verified on 2026-11-25** with the fictional sample resume using `openai/gpt-oss-20b`. Add your own provider key to `backend/.env`; that file is ignored by Git. Gemini parsing has not been verified.
 - **Natural-language semantic search was verified locally** with the cached MiniLM model and ChromaDB; the automated tests still stub embeddings.
 - **Emails:** with no `SMTP_HOST` set, nothing is sent. Messages are appended to `backend/notification_log.txt` as `[DEV LOG - NOT SENT]`. Candidates also get in-app notifications.
+- **Interview questions:** admins can generate role- and skill-specific question suggestions from each job. They use transparent templates, not an LLM, and should be reviewed before use.
 - Scanned (image-only) PDFs are rejected; there is no OCR.
 - Skill matching uses an alias table + whole-word text search, not embeddings per skill.
-- Not built: live video interviews and the stretch goals (agents, MCP, interview question generation, Docker).
+- Not built: live video interviews and the other stretch goals (multi-agent workflow, MCP, Docker).
 - Passwords are bcrypt-hashed. Login throttling and password-reset endpoints are implemented; the in-memory throttle is intended for a single local instance, not a multi-instance production deployment.
 
 See `documentation/INTERVIEW_GUIDE.md` for how to explain each part in the technical interview.

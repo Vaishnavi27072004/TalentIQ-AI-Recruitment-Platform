@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, ListChecks } from 'lucide-react'
 import api, { errorMessage } from '../../services/api'
 import useFetch from '../../hooks/useFetch'
 import { useToast } from '../../context/ToastContext'
@@ -64,11 +64,28 @@ export default function Jobs() {
   const toast = useToast()
   const { data, loading, error, reload } = useFetch('/api/jobs')
   const [editing, setEditing] = useState(null) // null = closed, {} = new, job = edit
+  const [questionJob, setQuestionJob] = useState(null)
+  const [questions, setQuestions] = useState([])
+  const [loadingQuestions, setLoadingQuestions] = useState(false)
 
   async function handleDelete(job) {
     if (!window.confirm(`Delete "${job.title}" and its applications?`)) return
     try { await api.delete(`/api/jobs/${job.id}`); toast.success('Job deleted'); reload() }
     catch (error) { toast.error(errorMessage(error)) }
+  }
+
+  async function showInterviewQuestions(job) {
+    setQuestionJob(job)
+    setQuestions([])
+    setLoadingQuestions(true)
+    try {
+      const response = await api.get(`/api/jobs/${job.id}/interview-questions`)
+      setQuestions(response.data.questions)
+    } catch (error) {
+      toast.error(errorMessage(error))
+    } finally {
+      setLoadingQuestions(false)
+    }
   }
 
   return (
@@ -90,6 +107,7 @@ export default function Jobs() {
                     <td className="td">{job.application_count}</td>
                     <td className="td"><StatusBadge value={job.status} /></td>
                     <td className="td whitespace-nowrap">
+                      <button className="mr-2 text-slate-500 hover:text-brand-600" title="Generate interview questions" aria-label={`Generate interview questions for ${job.title}`} onClick={() => showInterviewQuestions(job)}><ListChecks size={16} /></button>
                       <button className="mr-2 text-slate-500 hover:text-brand-600" title="Edit" onClick={() => setEditing(job)}><Pencil size={16} /></button>
                       <button className="text-slate-500 hover:text-red-600" title="Delete" onClick={() => handleDelete(job)}><Trash2 size={16} /></button>
                     </td>
@@ -103,6 +121,21 @@ export default function Jobs() {
       {editing && (
         <Modal title={editing.id ? 'Edit job' : 'New job'} onClose={() => setEditing(null)} wide>
           <JobForm job={editing.id ? editing : null} onClose={() => setEditing(null)} onSaved={() => { setEditing(null); reload() }} />
+        </Modal>
+      )}
+      {questionJob && (
+        <Modal title={`Interview questions: ${questionJob.title}`} onClose={() => setQuestionJob(null)}>
+          {loadingQuestions ? <p className="text-sm text-slate-500">Preparing questions...</p> : (
+            <ol className="list-decimal space-y-3 pl-5 text-sm text-slate-700">
+              {questions.map((item, index) => (
+                <li key={`${item.category}-${index}`}>
+                  <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-brand-600">{item.category}</span>
+                  {item.question}
+                </li>
+              ))}
+            </ol>
+          )}
+          <p className="mt-4 text-xs text-slate-400">Template-based suggestions from this job’s role and skills. Review and tailor them before an interview.</p>
         </Modal>
       )}
     </>

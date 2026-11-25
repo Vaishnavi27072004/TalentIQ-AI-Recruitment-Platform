@@ -33,6 +33,7 @@ After every scenario, record the observed result and any limitations in [README.
 
 - Backend health, demo-admin sign-in, and dashboard load were verified locally.
 - Scenario 6 was run through the API with the cached MiniLM model and ChromaDB; it returned five ranked candidates.
-- The backend test suite passes (36 tests). Automated tests are not a substitute for recording each live scenario.
+- The backend test suite passes (38 tests). Automated tests are not a substitute for recording each live scenario.
+- Admins can generate role- and skill-specific interview question suggestions from the Jobs page; this was verified through the live API and UI.
 - Groq parsing was verified locally with a fictional sample resume using `openai/gpt-oss-20b`. The key stays in the ignored `backend/.env`. SMTP remains unconfigured, so email delivery is not verified.
 - The remaining scenarios still need to be run and recorded in the browser. The video recording is also still outstanding.

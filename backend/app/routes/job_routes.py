@@ -57,6 +57,41 @@ def get_job(job_id: int, user: User = Depends(get_current_user), db: Session = D
     return job_to_dict(job, db)
 
 
+@router.get("/jobs/{job_id}/interview-questions", dependencies=[Depends(require_roles(ROLE_ADMIN))])
+def generate_interview_questions(job_id: int, db: Session = Depends(get_db)):
+    job = db.get(Job, job_id)
+    if job is None:
+        raise HTTPException(404, "Job not found")
+
+    skills = []
+    seen_skills = set()
+    for skill in (job.required_skills or []) + (job.preferred_skills or []):
+        skill = skill.strip()
+        if skill and skill.casefold() not in seen_skills:
+            skills.append(skill)
+            seen_skills.add(skill.casefold())
+
+    questions = [{
+        "category": "Role fit",
+        "question": f"What interests you about the {job.title} role, and which experience best prepares you for it?",
+    }]
+    for skill in skills[:5]:
+        questions.append({
+            "category": "Job skills",
+            "question": f"Tell me about a project where you used {skill}. What challenge did you solve, and what was the result?",
+        })
+    if not skills:
+        questions.append({
+            "category": "Job skills",
+            "question": f"What tools or methods would you bring to the {job.title} role, and why?",
+        })
+    questions.append({
+        "category": "Situational",
+        "question": f"If you joined as a {job.title} and received an unclear assignment, how would you clarify it and plan your first steps?",
+    })
+    return {"job_id": job.id, "job_title": job.title, "questions": questions}
+
+
 @router.put("/jobs/{job_id}", dependencies=[Depends(require_roles(ROLE_ADMIN))])
 def update_job(job_id: int, data: JobUpdate, db: Session = Depends(get_db)):
     job = db.get(Job, job_id)
