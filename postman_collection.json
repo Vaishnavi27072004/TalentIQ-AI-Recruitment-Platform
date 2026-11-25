@@ -1,0 +1,57 @@
+{
+  "info": {
+    "name": "TalentFlow API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8000"},
+    {"key": "token", "value": ""}
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {"method": "GET", "url": "{{baseUrl}}/api/health"}
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {"mode": "raw", "raw": "{\n  \"email\": \"admin@demo.com\",\n  \"password\": \"Admin@12345\"\n}"},
+        "url": "{{baseUrl}}/api/auth/login"
+      }
+    },
+    {
+      "name": "Dashboard",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+        "url": "{{baseUrl}}/api/analytics/dashboard"
+      }
+    },
+    {
+      "name": "Create Job",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{token}}"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {"mode": "raw", "raw": "{\n  \"title\": \"Data Analyst\",\n  \"description\": \"Analyse business data and build dashboards.\",\n  \"required_skills\": [\"Python\", \"SQL\"],\n  \"preferred_skills\": [\"Power BI\"],\n  \"min_experience\": 2,\n  \"max_experience\": 5,\n  \"education_requirement\": \"Bachelor degree\",\n  \"location\": \"Pune\",\n  \"employment_type\": \"Full-time\",\n  \"status\": \"active\"\n}"},
+        "url": "{{baseUrl}}/api/jobs"
+      }
+    },
+    {
+      "name": "Semantic Search",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{token}}"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {"mode": "raw", "raw": "{\n  \"query\": \"candidate with Python and SQL experience\",\n  \"top_k\": 10\n}"},
+        "url": "{{baseUrl}}/api/search/candidates"
+      }
+    }
+  ]
+}
