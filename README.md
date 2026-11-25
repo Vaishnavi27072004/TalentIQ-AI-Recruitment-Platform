@@ -151,16 +151,16 @@ Swagger UI is generated automatically at **http://localhost:8000/docs** (use *Au
 
 ## 7. Mandatory test scenarios, results
 
-**Automated results** (`backend/tests`, 26 tests passing). These run the real API, database, auth, scoring and workflow code, but use a *stub* in place of the LLM and the embedding model so they work offline. They prove the logic, not the live AI quality.
+**Automated results** (`backend/tests`, 36 tests passing). These run the real API, database, auth, scoring and workflow code, but use a *stub* in place of the LLM and the embedding model so they work offline. They prove the logic, not the live AI quality.
 
-| # | Scenario | Automated test | Live demo result (fill in after your run) |
+| # | Scenario | Automated test | Live verification |
 |---|---|---|---|
 | 1 | Candidate uploads resume → profile created | `test_s1_candidate_uploads_resume_profile_created` ✅ | ☐ Requires a live browser/API run |
 | 2 | Admin uploads 5 resumes → each processed individually | `test_s2_s3_bulk_upload_handles_bad_file_without_stopping` ✅ | ☐ Requires a live browser/API run |
 | 3 | Invalid file → error without affecting others | same test (corrupted PDF + .txt reported as *failed*, 5 good ones *completed*) ✅ | ☐ Requires a live browser/API run |
 | 4 | Admin creates job | `test_s4_admin_creates_job` ✅ | ☐ Requires a live browser/API run |
 | 5 | Select job → ranked candidates with scores | `test_s5_s7_matching_ranks_candidates_with_explanation` ✅ | ☐ Requires real embeddings |
-| 6 | Natural-language semantic search | **Not covered by automated test** (needs the real embedding model) | ☐ Requires MiniLM download and a live run |
+| 6 | Natural-language semantic search | **Not covered by automated test** (needs the real embedding model) | ✅ Verified 2026-11-25: local API + cached MiniLM and Chroma returned 5 ranked results |
 | 7 | Candidate profile + match explanation | `test_s5_s7_...` ✅ | ☐ Requires a live browser/API run |
 | 8 | Shortlist → job-specific shortlist | `test_s8_shortlisting_and_export` ✅ | ☐ Requires a live browser/API run |
 | 9 | Approve candidate → notification | `test_s9_s10_s11_approve_schedule_feedback` ✅ | ☐ Requires a live browser/API run |
@@ -172,11 +172,12 @@ Extra tests cover duplicate detection, duplicate applications, override survival
 
 ## 8. Honest limitations
 
-- **Not yet verified end-to-end with a real LLM key and the downloaded MiniLM model**; no Groq/Gemini key was configured in the current workspace, and the automated tests stub these two. Run scenarios 1, 2 and 6 with real credentials and update the table above.
+- **Real Groq/Gemini resume parsing is not yet verified**; add a provider key to `backend/.env` and upload a resume to test it. The offline parser is used while those keys are empty.
+- **Natural-language semantic search was verified locally** with the cached MiniLM model and ChromaDB; the automated tests still stub embeddings.
 - **Emails:** with no `SMTP_HOST` set, nothing is sent. Messages are appended to `backend/notification_log.txt` as `[DEV LOG - NOT SENT]`. Candidates also get in-app notifications.
 - Scanned (image-only) PDFs are rejected; there is no OCR.
 - Skill matching uses an alias table + whole-word text search, not embeddings per skill.
 - Not built: live video interviews and the stretch goals (agents, MCP, interview question generation, Docker).
-- Passwords are bcrypt-hashed, but there is no rate limiting or password reset.
+- Passwords are bcrypt-hashed. Login throttling and password-reset endpoints are implemented; the in-memory throttle is intended for a single local instance, not a multi-instance production deployment.
 
 See `documentation/INTERVIEW_GUIDE.md` for how to explain each part in the technical interview.
