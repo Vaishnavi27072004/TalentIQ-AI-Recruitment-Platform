@@ -72,9 +72,10 @@ def test_rag_provider_request_uses_retrieved_evidence(monkeypatch):
         [{"candidate_id": 7, "skills": ["Python"]}],
     )
 
-    assert answer == "Evidence-backed answer."
+    assert answer.startswith("Evidence-backed answer.")
+    assert "[candidate_id: 7]" in answer
     assert "candidate_id" in captured["request"]["messages"][1]["content"]
-    assert "[candidate_id: N]" in captured["request"]["messages"][0]["content"]
+    assert "[candidate_id: 123]" in captured["request"]["messages"][0]["content"]
 
 
 def test_rag_generation_requires_provider_key(monkeypatch):
