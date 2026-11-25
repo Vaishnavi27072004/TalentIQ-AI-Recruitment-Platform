@@ -34,5 +34,5 @@ After every scenario, record the observed result and any limitations in [README.
 - Backend health, demo-admin sign-in, and dashboard load were verified locally.
 - Scenario 6 was run through the API with the cached MiniLM model and ChromaDB; it returned five ranked candidates.
 - The backend test suite passes (36 tests). Automated tests are not a substitute for recording each live scenario.
-- `backend/.env` has a generated local secret, but no Groq/Gemini or SMTP credentials are configured. Real LLM parsing and email delivery are therefore not verified.
+- Groq parsing was verified locally with a fictional sample resume using `openai/gpt-oss-20b`. The key stays in the ignored `backend/.env`. SMTP remains unconfigured, so email delivery is not verified.
 - The remaining scenarios still need to be run and recorded in the browser. The video recording is also still outstanding.

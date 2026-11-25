@@ -172,7 +172,7 @@ Extra tests cover duplicate detection, duplicate applications, override survival
 
 ## 8. Honest limitations
 
-- **Real Groq/Gemini resume parsing is not yet verified**; add a provider key to `backend/.env` and upload a resume to test it. The offline parser is used while those keys are empty.
+- **Groq resume parsing was verified on 2026-11-25** with the fictional sample resume using `openai/gpt-oss-20b`. Add your own provider key to `backend/.env`; that file is ignored by Git. Gemini parsing has not been verified.
 - **Natural-language semantic search was verified locally** with the cached MiniLM model and ChromaDB; the automated tests still stub embeddings.
 - **Emails:** with no `SMTP_HOST` set, nothing is sent. Messages are appended to `backend/notification_log.txt` as `[DEV LOG - NOT SENT]`. Candidates also get in-app notifications.
 - Scanned (image-only) PDFs are rejected; there is no OCR.
