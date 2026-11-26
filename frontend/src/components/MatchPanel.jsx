@@ -28,7 +28,7 @@ export default function MatchPanel({ match, onChanged }) {
     <div className="space-y-4">
       <div className="flex items-center gap-4">
         <div className="flex h-20 w-20 flex-col items-center justify-center rounded-2xl bg-brand-50 text-brand-700">
-          <span className="text-2xl font-bold">{match.final_score}</span><span className="text-[10px]">out of 100</span>
+          <span className="text-2xl font-bold">{match.final_score}%</span><span className="text-[10px]">required skills</span>
         </div>
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-sm">AI recommendation: <StatusBadge value={match.ai_recommendation} /></div>
@@ -36,7 +36,12 @@ export default function MatchPanel({ match, onChanged }) {
         </div>
       </div>
 
-      <div>{COMPONENTS.map(([key, label]) => <ScoreBar key={key} label={label} score={d.scores[key]} weight={d.weights[key]} />)}</div>
+      <div>
+        <p className="label">{d.scores.skills == null ? 'Weighted match breakdown' : 'Additional fit signals'}</p>
+        {COMPONENTS.map(([key, label]) => (
+          <ScoreBar key={key} label={label} score={d.scores[key]} weight={d.scores.skills == null ? d.weights[key] : undefined} />
+        ))}
+      </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <div><p className="label">Matched required skills</p><SkillChips skills={d.matched_skills} tone="green" /></div>

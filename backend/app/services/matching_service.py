@@ -134,9 +134,8 @@ def get_weights() -> dict:
     }
 
 
-def calculate_final_match_score(component_scores: dict) -> float:
-    """Input: {"skills": 80, "experience": None, ...}. Output: weighted 0-100.
-    Components that are None are skipped and the other weights are re-scaled."""
+def calculate_weighted_match_score(component_scores: dict) -> float:
+    """Return the weighted score for available components, re-scaling skipped weights."""
     weights = get_weights()
     available = {name: score for name, score in component_scores.items() if score is not None}
     total_weight = sum(weights[name] for name in available)
@@ -144,6 +143,17 @@ def calculate_final_match_score(component_scores: dict) -> float:
         return 0.0
     weighted_sum = sum(score * weights[name] for name, score in available.items())
     return round(weighted_sum / total_weight, 1)
+
+
+def calculate_final_match_score(component_scores: dict) -> float:
+    """Input: component scores. Output: required-skill percentage, or weighted fallback.
+    When the job has required skills, the headline score is the matched-skill ratio so
+    7 of 10 requirements is shown as 70%. Jobs without required skills use available
+    experience, education, preferred-skill, and semantic scores with configured weights."""
+    skill_score = component_scores.get("skills")
+    if skill_score is not None:
+        return round(min(100.0, max(0.0, skill_score)), 1)
+    return calculate_weighted_match_score(component_scores)
 
 
 def recommend_from_score(final_score: float) -> str:

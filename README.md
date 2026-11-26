@@ -2,6 +2,8 @@
 
 Candidate portal, admin recruitment portal and interviewer portal in one app. An LLM parses resumes, embeddings power semantic search, and a transparent maths formula (not the LLM) scores candidates against jobs.
 
+TalentIQ is the repository/project name; TalentFlow is the product's user-facing app name.
+
 **Stack:** React + Vite + Tailwind · FastAPI + SQLAlchemy + SQLite · optional Groq/Gemini (resume parsing) · Sentence Transformers `all-MiniLM-L6-v2` · ChromaDB · PyMuPDF + python-docx · pandas · pytest
 
 ---
@@ -64,7 +66,7 @@ To use MySQL instead, create the database first, install the PyMySQL driver with
 
 Candidates can also register with their own email. All three roles use the same sign-in page; the account role determines the portal.
 
-**Run the tests:** `cd backend && python -m pytest -q` (47 tests, work offline, see section 7).
+**Run the tests:** `cd backend && python -m pytest -q` (48 tests, work offline, see section 7).
 
 **Sample data:** from `backend/`, run `python seed_demo_data.py` to load the included fictional job descriptions and valid DOCX resumes into the database. To regenerate the files, run `python sample_data/generate_sample_resumes.py` from the project root; it also writes invalid files used by the error-handling scenario. Job descriptions are in `sample_data/sample_jobs.md`.
 
@@ -152,17 +154,17 @@ The stdio MCP server (`backend/mcp_server.py`) registers four read-only tools: `
 
 ## 5. Matching methodology
 
-`final = Σ weight × component`, each component 0–100, weights in `.env` (default below).
+When a job lists required skills, the headline match percentage is `matched required skills / total required skills × 100` (so 7 of 10 is 70%). Experience, education, preferred skills, and semantic similarity remain visible as additional fit signals; they do not dilute the required-skill percentage. Candidates tied on required-skill percentage are ordered by the weighted fit signals as a secondary ranking. For jobs with no required skills, the available signals use the weighted fallback (weights in `.env`, defaults below).
 
 | Component | Weight | Rule |
 |---|---:|---|
-| Required skills | 35% | % of the job's required skills the candidate has (aliases handled, e.g. ML = machine learning; also found in project/work text) |
-| Experience | 25% | below minimum → years/min × 100; inside range → 100; above max → −5 per extra year, floored at 70 |
-| Education | 10% | highest detected level (diploma < bachelor < master < PhD) vs required level |
-| Preferred skills | 10% | % of nice-to-have skills present |
-| Semantic similarity | 20% | cosine(candidate vector, job vector), stretched from the band 0.15–0.75 onto 0–100 (raw MiniLM scores rarely leave that band) |
+| Required skills | 35%* | % of the job's required skills the candidate has (aliases handled, e.g. ML = machine learning; also found in project/work text) |
+| Experience | 25%* | below minimum → years/min × 100; inside range → 100; above max → −5 per extra year, floored at 70 |
+| Education | 10%* | highest detected level (diploma < bachelor < master < PhD) vs required level |
+| Preferred skills | 10%* | % of nice-to-have skills present |
+| Semantic similarity | 20%* | cosine(candidate vector, job vector), stretched from the band 0.15–0.75 onto 0–100 (raw MiniLM scores rarely leave that band) |
 
-If a job leaves a component empty (e.g. no preferred skills) that component is skipped and the other weights are re-scaled, so jobs are not punished for what they did not ask. Recommendation: ≥75 Strong Match, ≥50 Possible Match, else Weak Match (thresholds configurable).
+*These weights are used as secondary-ranking signals and as a fallback for jobs without a required-skills list. For those jobs, empty components are skipped and remaining weights are re-scaled. Recommendation: ≥75 Strong Match, ≥50 Possible Match, else Weak Match (thresholds configurable).
 
 ## 6. API documentation
 
@@ -170,7 +172,7 @@ Swagger UI is generated automatically at **http://localhost:8000/docs** (use *Au
 
 ## 7. Mandatory test scenarios, results
 
-**Automated results** (`backend/tests`, 47 tests passing). These run the real API, database, auth, scoring and workflow code, but use a *stub* in place of the LLM and the embedding model so they work offline. They prove the logic, not the live AI quality.
+**Automated results** (`backend/tests`, 48 tests passing). These run the real API, database, auth, scoring and workflow code, but use a *stub* in place of the LLM and the embedding model so they work offline. They prove the logic, not the live AI quality.
 
 | # | Scenario | Automated test | Live verification |
 |---|---|---|---|
@@ -198,6 +200,6 @@ Extra tests cover duplicate detection, duplicate applications, override survival
 - Scanned (image-only) PDFs are rejected; there is no OCR.
 - Skill matching uses an alias table + whole-word text search, not embeddings per skill.
 - Not built: live video interviews and the other stretch goals (multi-agent workflow, Docker). MCP tools and RAG answers are implemented.
-- Passwords are bcrypt-hashed. Login throttling and password-reset endpoints are implemented; the in-memory throttle is intended for a single local instance, not a multi-instance production deployment.
+- Passwords are bcrypt-hashed. The login page links to a password-reset flow; reset tokens are emailed when SMTP is configured (otherwise recorded in `backend/notification_log.txt`) and expire after 30 minutes. Login throttling is intended for a single local instance, not a multi-instance production deployment.
 
 See `documentation/INTERVIEW_GUIDE.md` for how to explain each part in the technical interview.

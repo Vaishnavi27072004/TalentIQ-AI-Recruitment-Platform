@@ -41,7 +41,7 @@ export default function Matching() {
 
   return (
     <>
-      <PageHeader title="AI Matching" subtitle="Hybrid score = skills 35% + experience 25% + education 10% + preferred skills 10% + semantic 20%" />
+      <PageHeader title="AI Matching" subtitle="Match percentage is the share of required skills found in each resume; other fit signals are shown in the breakdown." />
       <div className="card mb-4 flex flex-wrap items-end gap-3">
         <div className="min-w-[240px] flex-1">
           <Field label="Select a job">
@@ -67,7 +67,7 @@ export default function Matching() {
                     <td className="td"><input type="checkbox" checked={selected.includes(m.candidate_id)} onChange={() => toggle(m.candidate_id)} /></td>
                     <td className="td">{index + 1}</td>
                     <td className="td font-medium">{m.name || m.email}</td>
-                    <td className="td"><b>{m.final_score}</b></td>
+                    <td className="td"><b>{m.final_score}%</b></td>
                     <td className="td">{m.details.scores.skills ?? '-'}</td>
                     <td className="td text-xs text-red-600">{m.details.missing_skills.join(', ') || '-'}</td>
                     <td className="td"><StatusBadge value={m.effective_recommendation} /></td>

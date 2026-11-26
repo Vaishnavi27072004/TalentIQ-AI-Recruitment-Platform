@@ -107,7 +107,8 @@ def test_s5_s7_matching_ranks_candidates_with_explanation(client, admin_headers)
         ("files", resume_file("Strong", "strong@example.com", years=3)),
         ("files", resume_file("Junior", "junior@example.com", years=0))])
     ranked = client.post(f"/api/matching/jobs/{job_id}/run", headers=admin_headers).json()
-    assert ranked[0]["name"] == "Strong" and ranked[0]["final_score"] > ranked[1]["final_score"]
+    assert ranked[0]["name"] == "Strong"
+    assert ranked[0]["final_score"] == ranked[1]["final_score"]
     details = ranked[0]["details"]
     assert details["missing_skills"] == ["Power BI"] and "Power BI" in details["explanation"]
 

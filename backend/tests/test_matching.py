@@ -42,17 +42,39 @@ def test_semantic_score_is_normalised_and_clipped():
     assert m.calculate_semantic_score(None) is None
 
 
-def test_final_score_uses_weights():
+def test_final_score_uses_required_skill_percentage():
     scores = {"skills": 100, "experience": 100, "education": 100, "preferred": 100, "semantic": 100}
     assert m.calculate_final_match_score(scores) == 100.0
-    scores = {"skills": 100, "experience": 0, "education": 0, "preferred": 0, "semantic": 0}
-    assert m.calculate_final_match_score(scores) == 35.0  # 35% weight
+    scores = {"skills": 70, "experience": 0, "education": 0, "preferred": 0, "semantic": 0}
+    assert m.calculate_final_match_score(scores) == 70.0
 
 
-def test_final_score_rescales_when_component_missing():
-    # preferred is None, so remaining weights (0.90) are re-scaled: result must still be 100
-    scores = {"skills": 100, "experience": 100, "education": 100, "preferred": None, "semantic": 100}
-    assert m.calculate_final_match_score(scores) == 100.0
+def test_final_score_uses_weighted_fallback_when_required_skills_are_absent():
+    scores = {"skills": None, "experience": 0, "education": 100, "preferred": None, "semantic": 100}
+    assert m.calculate_final_match_score(scores) == 54.5
+
+
+def test_seven_of_ten_required_skills_produces_seventy_percent():
+    candidate = SimpleNamespace(
+        technical_skills=["Python", "SQL", "Pandas", "NumPy", "Git", "Docker", "AWS"],
+        total_experience_years=1,
+        education=[],
+        summary="",
+        projects=[],
+        employment_history=[],
+    )
+    job = SimpleNamespace(
+        required_skills=["Python", "SQL", "Pandas", "NumPy", "Git", "Docker", "AWS", "Spark", "Airflow", "Linux"],
+        preferred_skills=[],
+        min_experience=5,
+        max_experience=None,
+        education_requirement="",
+    )
+
+    result = m.match_candidate_to_job(candidate, job, 0.1)
+
+    assert len(result["details"]["matched_skills"]) == 7
+    assert result["final_score"] == 70.0
 
 
 def test_full_match_builds_explanation_from_real_data():

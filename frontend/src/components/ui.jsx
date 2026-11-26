@@ -96,7 +96,7 @@ export function ScoreBar({ label, score, weight }) {
   return (
     <div className="mb-2">
       <div className="flex justify-between text-xs text-slate-600">
-        <span>{label} <span className="text-slate-400">({Math.round(weight * 100)}% weight)</span></span>
+        <span>{label}{weight != null && <span className="text-slate-400"> ({Math.round(weight * 100)}% weight)</span>}</span>
         <span className="font-semibold">{isMissing ? 'N/A (not in job)' : `${score}/100`}</span>
       </div>
       <div className="h-2 rounded-full bg-slate-100"><div className={`h-2 rounded-full ${color}`} style={{ width: `${isMissing ? 0 : score}%` }} /></div>

@@ -10,7 +10,7 @@ from app.models.tables import Job, Candidate, MatchResult, ROLE_ADMIN
 from app.routes.candidate_routes import candidate_to_dict
 from app.schemas.schemas import OverrideRequest, RagRequest, SearchRequest
 from app.services import embedding_service
-from app.services.matching_service import match_candidate_to_job
+from app.services.matching_service import calculate_weighted_match_score, match_candidate_to_job
 from app.services.rag_service import RagGenerationError, generate_grounded_answer
 from app.services.semantic_search import semantic_search
 
@@ -28,6 +28,12 @@ def match_to_dict(match: MatchResult, candidate: Candidate) -> dict:
         "effective_recommendation": match.admin_override or match.ai_recommendation,
         "details": match.details,
     }
+
+
+def match_ranking_key(match: MatchResult) -> tuple[float, float]:
+    scores = (match.details or {}).get("scores", {})
+    contextual_score = calculate_weighted_match_score(scores)
+    return match.final_score or 0, contextual_score
 
 
 def calculate_and_store_match(db: Session, job: Job, candidate: Candidate) -> MatchResult:
@@ -53,14 +59,15 @@ def run_matching(job_id: int, db: Session = Depends(get_db)):
     candidates = db.query(Candidate).all()
     matches = [(calculate_and_store_match(db, job, c), c) for c in candidates]
     db.commit()
-    matches.sort(key=lambda pair: pair[0].final_score or 0, reverse=True)
+    matches.sort(key=lambda pair: match_ranking_key(pair[0]), reverse=True)
     return [match_to_dict(m, c) for m, c in matches]
 
 
 @router.get("/matching/jobs/{job_id}")
 def get_stored_matches(job_id: int, db: Session = Depends(get_db)):
     rows = (db.query(MatchResult, Candidate).join(Candidate, Candidate.id == MatchResult.candidate_id)
-            .filter(MatchResult.job_id == job_id).order_by(MatchResult.final_score.desc()).all())
+            .filter(MatchResult.job_id == job_id).all())
+    rows.sort(key=lambda row: match_ranking_key(row[0]), reverse=True)
     return [match_to_dict(m, c) for m, c in rows]
 
 
