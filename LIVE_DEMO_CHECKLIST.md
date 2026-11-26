@@ -11,7 +11,7 @@ The repository includes the demo recording at `Demo Video (1).mp4`. This checkli
 - [ ] Add a Groq or Gemini key only if testing real LLM extraction.
 - [ ] Run `setup.ps1`.
 - [ ] Run `start.ps1`.
-- [ ] Confirm http://localhost:8000/api/health returns `{"status":"ok"}`.
+- [ ] Confirm http://localhost:8001/api/health returns `{"status":"ok"}`.
 - [ ] Confirm http://localhost:5173 opens.
 
 ## Record These 12 Scenarios

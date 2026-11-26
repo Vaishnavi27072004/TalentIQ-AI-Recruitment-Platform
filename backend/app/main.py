@@ -1,5 +1,5 @@
 """FastAPI entry point. Run:  uvicorn app.main:app --reload   (from the backend folder)
-Swagger API docs are generated automatically at http://localhost:8000/docs"""
+Swagger API docs are generated automatically at http://localhost:8001/docs"""
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 

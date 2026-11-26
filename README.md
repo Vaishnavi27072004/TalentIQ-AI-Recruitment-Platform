@@ -24,12 +24,12 @@ Open PowerShell in the project folder and run:
 Then open:
 
 - Frontend: http://localhost:5173
-- Backend Swagger: http://localhost:8000/docs
+- Backend Swagger: http://localhost:8001/docs
 
 `setup.ps1` creates the virtual environment, installs dependencies, copies `.env.example` to `.env`, and seeds demo accounts, jobs, and resumes. `start.ps1` opens the backend and frontend in separate terminals.
 The setup step seeds the fictional sample jobs and valid DOCX resumes from `sample_data/` into the database and upload store. It is safe to rerun; invalid test files are intentionally excluded.
 
-To use the MCP server in VS Code, open this repository folder as the workspace after setup. Approve or start the `talentflow` server from `.vscode/mcp.json` and enter an admin email/password when prompted. If the backend is on a different port, update `TALENTFLOW_API_URL` in that config; the default is `http://127.0.0.1:8000`.
+To use the MCP server in VS Code, open this repository folder as the workspace after setup. Approve or start the `talentflow` server from `.vscode/mcp.json` and enter an admin email/password when prompted. If the backend is on a different port, update `TALENTFLOW_API_URL` in that config; the default is `http://127.0.0.1:8001`.
 
 ### Manual setup
 
@@ -41,7 +41,7 @@ source venv/bin/activate            # Windows: venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 copy ..\.env.example .env           # then edit .env; a Groq/Gemini key is optional
 python seed_demo_data.py            # creates demo accounts, sample jobs and sample candidates/resumes
-uvicorn app.main:app --reload       # API on http://localhost:8000  (Swagger docs: /docs)
+uvicorn app.main:app --reload --port 8001  # API on http://localhost:8001  (Swagger docs: /docs)
 
 # 2) Frontend (new terminal)
 cd frontend
@@ -168,7 +168,7 @@ When a job lists required skills, the headline match percentage is `matched requ
 
 ## 6. API documentation
 
-Swagger UI is generated automatically at **http://localhost:8000/docs** (use *Authorize* with `admin@demo.com`). All endpoints are under `/api`.
+Swagger UI is generated automatically at **http://localhost:8001/docs** (use *Authorize* with `admin@demo.com`). All endpoints are under `/api`.
 
 ## 7. Mandatory test scenarios, results
 

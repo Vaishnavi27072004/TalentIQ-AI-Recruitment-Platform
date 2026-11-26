@@ -14,7 +14,7 @@ _access_token: str | None = None
 
 
 def _api_base_url() -> str:
-    value = os.environ.get("TALENTFLOW_API_URL", "http://127.0.0.1:8000").rstrip("/")
+    value = os.environ.get("TALENTFLOW_API_URL", "http://127.0.0.1:8001").rstrip("/")
     parsed = urlsplit(value)
     if parsed.scheme != "http" or not parsed.hostname or parsed.username or parsed.password:
         raise ValueError("TALENTFLOW_API_URL must be an HTTP loopback URL.")

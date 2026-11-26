@@ -20,7 +20,7 @@
         "${workspaceFolder}\\backend\\mcp_server.py"
       ],
       "env": {
-        "TALENTFLOW_API_URL": "http://127.0.0.1:8000",
+        "TALENTFLOW_API_URL": "http://127.0.0.1:8001",
         "TALENTFLOW_EMAIL": "${input:talentflowEmail}",
         "TALENTFLOW_PASSWORD": "${input:talentflowPassword}"
       }
