@@ -70,7 +70,7 @@ export default function DashboardLayout() {
         <div className="mb-9 flex items-center gap-3 px-2">
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 text-white shadow-md shadow-brand-600/20"><Briefcase size={19} /></span>
           <div>
-            <p className="text-lg font-bold tracking-tight text-navy-900">TalentFlow</p>
+            <p className="text-lg font-bold tracking-tight text-navy-900">TalentIQ</p>
             <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">Hiring workspace</p>
           </div>
         </div>
@@ -98,7 +98,7 @@ export default function DashboardLayout() {
             </button>
             <div>
               <p className="text-sm font-semibold text-navy-900">{TITLES[user.role]}</p>
-              <p className="hidden text-xs text-slate-400 sm:block">TalentFlow recruitment workspace</p>
+              <p className="hidden text-xs text-slate-400 sm:block">TalentIQ recruitment workspace</p>
             </div>
           </div>
           <div className="flex items-center gap-3 sm:gap-5">

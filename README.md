@@ -1,8 +1,8 @@
-# TalentFlow — AI-Powered Recruitment & Interview Management Platform
+# TalentIQ — AI-Powered Recruitment & Interview Management Platform
 
 Candidate portal, admin recruitment portal and interviewer portal in one app. An LLM parses resumes, embeddings power semantic search, and a transparent maths formula (not the LLM) scores candidates against jobs.
 
-TalentIQ is the repository/project name; TalentFlow is the product's user-facing app name.
+TalentIQ is the product name used throughout the repository and application.
 
 **Stack:** React + Vite + Tailwind · FastAPI + SQLAlchemy + SQLite · optional Groq/Gemini (resume parsing) · Sentence Transformers `all-MiniLM-L6-v2` · ChromaDB · PyMuPDF + python-docx · pandas · pytest
 

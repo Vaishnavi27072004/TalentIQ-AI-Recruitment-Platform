@@ -12,7 +12,7 @@ function BrandMark({ compact = false }) {
       <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 text-white shadow-lg shadow-brand-900/20">
         <Briefcase size={19} />
       </span>
-      <span className="text-xl font-bold tracking-tight">TalentFlow</span>
+      <span className="text-xl font-bold tracking-tight">TalentIQ</span>
     </div>
   )
 }
@@ -48,7 +48,7 @@ export default function AuthLayout({ title, description, children }) {
         <div className="mb-8 lg:hidden"><BrandMark compact /></div>
         <div className="w-full max-w-md">
           <div className="mb-7">
-            <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-brand-600">TalentFlow account</p>
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-brand-600">TalentIQ account</p>
             <h1 className="text-3xl font-bold tracking-tight text-navy-900">{title}</h1>
             <p className="mt-2 text-sm leading-6 text-slate-500">{description}</p>
           </div>
